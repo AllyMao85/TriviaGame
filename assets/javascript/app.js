@@ -5,7 +5,7 @@ function questions(question,options,answer,explainations) {
     this.answer=answer;
     this.explainations=explainations;
 }
-//var selected = false;
+var selected = false;
 var sel='';
 var question1 =new questions(
     "If r•s≠0, then what is the value of r/s + s/r\?\n(1) r•s=8\n(2) r/s=2", 
@@ -152,96 +152,104 @@ var wins=0;
 var loses=0;
 function showsummary() {
     cleanContent();
-    $('<div>').html("The number of correct answers: "+wins +".<br/> The number of wrong answers: "+loses).appendTo('#mainpage');
+    $('<div>').html("The number of correct answers: "+wins +".<br/> The number of wrong answers: "+loses+".<br/><br/>").appendTo('#mainpage');
+    $('<button>').attr('id',"startoverBtn").text("Startover").appendTo("#mainpage");
 }
 
-function quesQueue(obj) {
+function quesQueue(i) {
     
-    var county=0;
-    var ctdowny=30;
-    var finishloop=false;
+    county=0;
+    ctdowny=30;
+    
+    finishloop=false;
+    selected=false;
     clearInterval(countdown);
-    clearTimeout(questionTimeout);
+   // clearInterval(answerreviewctdown);
+   // clearTimeout(questionTimeout);
       cleanContent();
-      showquestion(obj);
+      showquestion(questionBank[i]);
      // console.log(obj);
-      //question interval&time remain
-      var countdown=setInterval(function(){ 
-        //questionRemain();
-        county++;
-        ctdowny=30-county;  
-        $("#remainingtime").text("Time Remaining: "+ ctdowny+ " Seconds");
-      },1000);
-      //question timeout
-      var questionTimeout=setTimeout(function(){
-        var countx=0;
-        var ctdownx=10;
-         clearInterval(countdown);
-         cleanContent();
-         $('<div>').html("Time is out.<br/> The correct answer is "+obj.answer +".<br/> The explanation: "+obj.explainations).appendTo('#mainpage');      
-        var answerreviewctdown=setInterval(function(){                
-                //answerRemain();
-                countx++;
-                ctdownx=10-countx;  
-                $("#remainingtime").text("Time Remaining to review answers: "+ ctdownx+ " Seconds");
-        },1000);
-        var answerTimeout=setTimeout(function(){
-            clearInterval(answerreviewctdown);
-        },10000)
-        loses++;
-        //console.log("loses: "+loses);
-        finishloop=true;
-      },30000);
-      //answerRemain();
+      //question interval&time remain<-  start from here
     //   var countdown=setInterval(function(){ 
     //     questionRemain();
-    //     if(ctdowny == 0|| selected) {
-    //         ctdowny = 0;
-    //         cleanContent();
-    //         $('<div>').html("Time is out.<br/> The correct answer is "+obj.answer +".<br/> The explanation: "+obj.explainations).appendTo('#mainpage');
-    //         clearInterval(countdown);       
-    //         var answerreviewctdown=setInterval(function(){                
-    //             answerRemain();
-    //             if(ctdownx == 0) {
-    //               //  clearInterval(countdown);
-    //                 clearInterval(answerreviewctdown);
-    //             }
-    //         }, 1000);  
-           
-    //         loses++;
-    //         finishloop=true;
-    //     }
-    //    }, 1000);
+       
+    //   },1000);
+      //question timeout
+    //   var questionTimeout=setTimeout(function(){
+    //     var countx=0;
+    //     var ctdownx=10;
+    //      clearInterval(countdown);
+    //      cleanContent();
+    //      $('<div>').html("Time is out.<br/> The correct answer is "+obj.answer +".<br/> The explanation: "+obj.explainations).appendTo('#mainpage');      
+    //     var answerreviewctdown=setInterval(function(){                
+    //         answerRemain();           
+    //     },1000);
+    //     var answerTimeout=setTimeout(function(){
+    //         clearInterval(answerreviewctdown);
+    //     },10000)
+    //     loses++;
+    //     finishloop=true;
+    //   },30000);
+      //answerRemain();  <-end here
+      var countdown=setInterval(function(){ 
+        questionRemain();
+        if(ctdowny == 0|| selected) {
+            ctdowny = 0;
+            cleanContent();
+            $('#mainpage').text("Your answer is wrong. The corrent answer is "+questionBank[i].answer +". The explanation: "+questionBank[i].explainations);
+            countx=0;
+            ctdownx=10; 
+            var answerreviewctdown=setInterval(function(){  
+                                
+                   answerRemain();           
+                   },1000);   
+            clearInterval(countdown);
+            var answerTimeout=setTimeout(function(){
+                    clearInterval(answerreviewctdown);
+                    console.log(i);
+                    if (i===questionBank.length-1) {
+                        showsummary();
+                    } else {
+                        quesQueue(i+1);
+                    }
+               },10000)     
+                //if(ctdowny == 0) {
+                  //  clearInterval(countdown);
+                 //clearInterval(answerreviewctdown);           
+                loses=questionBank.length-wins;
+                finishloop=true;
+           // }
+        }
+       }, 1000);
       
     
       //radio button was non existent at the time the event was bound, need to delegate the event
       $("#mainpage").on('click', 'input[name=exampleRadios]:radio', function() { 
           // addd next++ to increment by clicks
-          //selected = true;
-          var countx=0;
-          var ctdownx=10;
+          selected = true;
+          county=0;
+          ctdowny=10;
           sel=$("input[name=exampleRadios]:checked").val();
           //console.log(sel);
-          clearInterval(countdown);
-          clearTimeout(questionTimeout);
+          //clearInterval(countdown);
+          //clearTimeout(questionTimeout);
           //this one don't work
-          var answerreviewctdown=setInterval(function(){ 
-            //answerRemain() 
-              countx++;
-              ctdownx=10-countx;  
-              $("#remainingtime").text("Time Remaining to review answers: "+ ctdownx+ " Seconds");
-         }, 1000);
-          if (sel===obj.answer) {
-             cleanContent(); 
-             $('#mainpage').text("Congrats! Your answer is correct!");
+        //   var answerreviewctdown=setInterval(function(){ 
+        //     answerRemain()              
+        //  }, 1000);
+          if (sel===questionBank[i].answer) {
+             //cleanContent(); 
+             //$('#mainpage').text("Congrats! Your answer is correct!");
+             $('#mainpage').prepend("Congrats! Your answer is correct!");
              wins++;
              console.log("wins: "+wins);
-          } else {
-             loses++;
-             console.log("loses: "+loses);
-             cleanContent();
-             $('#mainpage').text("Your answer is wrong. The corrent answer is "+obj.answer +". The explanation: "+obj.explainations);
-          }
+          } 
+        //   else {
+        //      loses++;
+        //      console.log("loses: "+loses);
+        //      cleanContent();
+        //      $('#mainpage').text("The corrent answer is "+questionBank[i].answer +". The explanation: "+questionBank[i].explainations);
+        //   }
        
        finishloop=true;
     })  
@@ -261,21 +269,18 @@ function quesQueue(obj) {
 $('#start').on("click",function(){
     $('#start').remove();
     var i = 0;
-    quesQueue(questionBank[i]);
-   // var calInterval=countx*1000+10000;
-    setInterval(function() {
-        // console.log(countx);
-        // console.log(county);
-        i++;
-        quesQueue(questionBank[i])
-        
-       // console.log(calInterval);
-       // console.log(ctdowny);
-    }, 40000); //(countx+county)*1000
-   // console.log(i);
-    
-    // console.log(wins);
-    // console.log(loses);
+    quesQueue(i);
+   
+})
+
+
+$("#mainpage").on('click', 'button[id=startoverBtn]', function() {
+
+    //$('#start').remove();
+    cleanContent(); 
+    var i = 0;
+    quesQueue(i);
+   
 })
     // for (var i=1;i<questionBank.length;i++) {
     //     quesQueue(questionBank[i]);
