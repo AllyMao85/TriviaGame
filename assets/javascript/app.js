@@ -155,12 +155,12 @@ function showsummary() {
     $('<div>').html("The number of correct answers: "+wins +".<br/> The number of wrong answers: "+loses+".<br/><br/>").appendTo('#mainpage');
     $('<button>').attr('id',"startoverBtn").text("Startover").appendTo("#mainpage");
 }
-
+var correct=false;
 function quesQueue(i) {
     
     county=0;
     ctdowny=30;
-    
+    correct=false;
     finishloop=false;
     selected=false;
     clearInterval(countdown);
@@ -196,7 +196,11 @@ function quesQueue(i) {
         if(ctdowny == 0|| selected) {
             ctdowny = 0;
             cleanContent();
-            $('#mainpage').text("Your answer is wrong. The corrent answer is "+questionBank[i].answer +". The explanation: "+questionBank[i].explainations);
+            if (correct===true) {
+                $('#mainpage').prepend("Congrats! Your answer is correct!");
+            } else {
+            $('#mainpage').text("Your answer is wrong. The corrent answer is "+questionBank[i].answer +". The explanation: "+questionBank[i].explainations);  
+             }
             countx=0;
             ctdownx=10; 
             var answerreviewctdown=setInterval(function(){  
@@ -240,17 +244,11 @@ function quesQueue(i) {
           if (sel===questionBank[i].answer) {
              //cleanContent(); 
              //$('#mainpage').text("Congrats! Your answer is correct!");
-             $('#mainpage').prepend("Congrats! Your answer is correct!");
+             
              wins++;
+             correct=true;
              console.log("wins: "+wins);
           } 
-        //   else {
-        //      loses++;
-        //      console.log("loses: "+loses);
-        //      cleanContent();
-        //      $('#mainpage').text("The corrent answer is "+questionBank[i].answer +". The explanation: "+questionBank[i].explainations);
-        //   }
-       
        finishloop=true;
     })  
   
@@ -275,7 +273,8 @@ $('#start').on("click",function(){
 
 
 $("#mainpage").on('click', 'button[id=startoverBtn]', function() {
-
+     wins=0;
+     loses=0;
     //$('#start').remove();
     cleanContent(); 
     var i = 0;
